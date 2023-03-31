@@ -75,11 +75,11 @@ WSGI_APPLICATION = 'QS.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'Qs',
-        'USER': 'postgres',
-        'PASSWORD': '251hazem179',
-        'HOST': 'localhost',
-        'PORT': '5432',
+        'NAME': '',
+        'USER': '',
+        'PASSWORD': '',
+        'HOST': '',
+        'PORT': '',
     }
 }
 
