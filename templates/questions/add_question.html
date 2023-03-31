@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>Questions</title>
+</head>
+<body>
+<form method="POST" action="{% url 'add_question' %}">
+        {% csrf_token %}
+<div>
+     <label for="question-types">نوع السؤال : </label>
+    <select id="question-types">
+    <option value="text">نص</option>
+    <option value="video">فيديو</option>
+    <option value="audio">تسجيل صوتي</option>
+</select>
+</div>
+    <br>
+<div id="my-container">
+    <input type="text" name="text-input">
+</div>
+
+    <p>
+    <label for="description">الوصف:</label>
+    <textarea name="description" cols="40" rows="10" id="description"></textarea>
+  </p>
+    <div id="answers">
+        <input type="button" value="اضافة اجابة" id="add_more_fields">
+        <input type="button" value="حذف اجابة" id="remove_field">
+        <br>
+
+<div id="container">
+    <input placeholder="ادخل الاجابة" name = "answer"><input type="checkbox" name="correct">
+</div>
+    </div>
+
+    <br>
+
+    <br>
+    <input type="submit" value="اضافة السؤال">
+</form>
+<script>
+    // script.js
+
+{#    #}
+{#    ###############################}
+    var survey_options = document.getElementById('answers');
+    var add_more_fields = document.getElementById('add_more_fields');
+    var remove_field = document.getElementById('remove_field');
+    let count = 0;
+    add_more_fields.onclick = function () {
+            // Create a new div element
+    const newDiv = document.createElement('div');
+    const newDivId = `new-div-${count}`;
+    newDiv.setAttribute('id', newDivId);
+    // Create a new input element
+    const newInput = document.createElement('input');
+    newInput.type = 'text';
+    newInput.name = 'my-input';
+    newInput.placeholder = "ادخل الاجابة";
+
+    // Create a new checkbox element
+    const newCheckbox = document.createElement('input');
+    newCheckbox.type = 'checkbox';
+    newCheckbox.name = 'my-checkbox';
+
+    // Add the input field and checkbox to the div
+    newDiv.appendChild(newInput);
+    newDiv.appendChild(newCheckbox);
+
+    // Add the new div to the container
+    container.appendChild(newDiv);
+    count++;
+    };
+    remove_field.onclick = function () {
+    container.addEventListener('click', (event) => {
+    if (event.target.type === 'checkbox' && event.target.name.startsWith('delete-checkbox-')) {
+      const divId = event.target.getAttribute('id').replace('checkbox', 'new-div');
+      const divToRemove = document.getElementById(divId);
+      divToRemove.remove();
+    }
+  });
+    };
+
+
+
+document.addEventListener('DOMContentLoaded', () => {
+    const dropdown = document.getElementById('question-types');
+    const container = document.getElementById('my-container');
+
+    dropdown.addEventListener('change', () => {
+        const selectedOption = dropdown.value;
+
+        // Clear the container of any existing elements
+        container.innerHTML = '';
+
+        // Generate new elements based on the selected option
+        if (selectedOption === 'text') {
+            const newElement = document.createElement('input');
+            newElement.type = 'text';
+            newElement.name = 'text-input';
+            container.appendChild(newElement);
+        } else if (selectedOption === 'audio') {
+            const newElement = document.createElement('input');
+            newElement.type = 'file';
+            newElement.name = 'audio-input';
+            newElement.accept = 'audio/*'
+            container.appendChild(newElement);
+        } else if (selectedOption === 'video') {
+            const newElement = document.createElement('input');
+            newElement.type = 'file';
+            newElement.name = 'video-input';
+            newElement.accept = 'video/*'
+            container.appendChild(newElement);
+        }
+    });
+});
+
+</script>
+</body>
+</html>
