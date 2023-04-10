@@ -3,118 +3,164 @@
 <head>
     <meta charset="UTF-8">
     <title>Questions</title>
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
 </head>
 <body>
-<form method="POST" action="{% url 'add_question' %}">
-        {% csrf_token %}
-<div>
-     <label for="question-types">نوع السؤال : </label>
-    <select id="question-types">
-    <option value="text">نص</option>
-    <option value="video">فيديو</option>
-    <option value="audio">تسجيل صوتي</option>
-</select>
-</div>
+<form method="POST" action="{% url 'add_question' %}" id="my-form">
+    {% csrf_token %}
+    <div>
+        <label for="question-types">نوع السؤال : </label>
+        <select id="question-types">
+            <option value="text">نص</option>
+            <option value="video">فيديو</option>
+            <option value="audio">تسجيل صوتي</option>
+        </select>
+    </div>
     <br>
-<div id="my-container">
-    <input type="text" name="text-input">
-</div>
-
-    <p>
-    <label for="description">الوصف:</label>
-    <textarea name="description" cols="40" rows="10" id="description"></textarea>
-  </p>
-    <div id="answers">
-        <input type="button" value="اضافة اجابة" id="add_more_fields">
-        <input type="button" value="حذف اجابة" id="remove_field">
-        <br>
-
-<div id="container">
-    <input placeholder="ادخل الاجابة" name = "answer"><input type="checkbox" name="correct">
-</div>
+    <div id="my-container">
+        <label for="question">السؤال:</label>
+        <input type="text" name="text-input" id="question">
     </div>
 
+    <p>
+        <label for="description">الوصف:</label>
+        <textarea name="description" cols="40" rows="10" id="description"></textarea>
+    </p>
+
     <br>
 
     <br>
-    <input type="submit" value="اضافة السؤال">
+    <div id="form-fields">
+        <div class="form-field">
+            <label for="field1"> الاجابة رقم 1:</label>
+            <input type="text" name="field1" id="field1"/>
+            <input
+                    type="checkbox"
+                    name="field1-checkbox"
+                    id="field1-checkbox"
+            />
+        </div>
+    </div>
+    <button type="button" onclick="addFormField()">اضافة اجابة</button>
+    <button type="submit">حفظ السؤال</button>
 </form>
+
 <script>
-    // script.js
+    let fieldCount = 1;
 
-{#    #}
-{#    ###############################}
-    var survey_options = document.getElementById('answers');
-    var add_more_fields = document.getElementById('add_more_fields');
-    var remove_field = document.getElementById('remove_field');
-    let count = 0;
-    add_more_fields.onclick = function () {
-            // Create a new div element
-    const newDiv = document.createElement('div');
-    const newDivId = `new-div-${count}`;
-    newDiv.setAttribute('id', newDivId);
-    // Create a new input element
-    const newInput = document.createElement('input');
-    newInput.type = 'text';
-    newInput.name = 'my-input';
-    newInput.placeholder = "ادخل الاجابة";
 
-    // Create a new checkbox element
-    const newCheckbox = document.createElement('input');
-    newCheckbox.type = 'checkbox';
-    newCheckbox.name = 'my-checkbox';
-
-    // Add the input field and checkbox to the div
-    newDiv.appendChild(newInput);
-    newDiv.appendChild(newCheckbox);
-
-    // Add the new div to the container
-    container.appendChild(newDiv);
-    count++;
-    };
-    remove_field.onclick = function () {
-    container.addEventListener('click', (event) => {
-    if (event.target.type === 'checkbox' && event.target.name.startsWith('delete-checkbox-')) {
-      const divId = event.target.getAttribute('id').replace('checkbox', 'new-div');
-      const divToRemove = document.getElementById(divId);
-      divToRemove.remove();
+    function addFormField() {
+        fieldCount++;
+        const formFields = document.getElementById("form-fields");
+        const newField = document.createElement("div");
+        newField.classList.add("form-field");
+        newField.innerHTML = `
+    <label for="field${fieldCount}">الاجابة رقم: ${fieldCount}:</label>
+    <input type="text" name="field${fieldCount}" id="field${fieldCount}">
+    <input type="checkbox" name="field${fieldCount}-checkbox" id="field${fieldCount}-checkbox">
+    <button type="button" class="remove-button" onclick="removeFormField(this)">حذف الاجابة</button>
+  `;
+        formFields.appendChild(newField);
     }
-  });
-    };
 
 
+    function removeFormField(button) {
+        const formField = button.parentNode;
+        formField.parentNode.removeChild(formField);
+        fieldCount--;
+    }
 
-document.addEventListener('DOMContentLoaded', () => {
-    const dropdown = document.getElementById('question-types');
-    const container = document.getElementById('my-container');
 
-    dropdown.addEventListener('change', () => {
-        const selectedOption = dropdown.value;
+    const form = document.querySelector("form");
 
-        // Clear the container of any existing elements
-        container.innerHTML = '';
 
-        // Generate new elements based on the selected option
-        if (selectedOption === 'text') {
-            const newElement = document.createElement('input');
-            newElement.type = 'text';
-            newElement.name = 'text-input';
-            container.appendChild(newElement);
-        } else if (selectedOption === 'audio') {
-            const newElement = document.createElement('input');
-            newElement.type = 'file';
-            newElement.name = 'audio-input';
-            newElement.accept = 'audio/*'
-            container.appendChild(newElement);
-        } else if (selectedOption === 'video') {
-            const newElement = document.createElement('input');
-            newElement.type = 'file';
-            newElement.name = 'video-input';
-            newElement.accept = 'video/*'
-            container.appendChild(newElement);
+    form.addEventListener("submit", (event) => {
+
+        event.preventDefault();
+
+
+        const checkedInputValues = [];
+        const inputValues = [];
+        const formData = new FormData();
+
+        form.querySelectorAll('[id*="field"]').forEach((input) => {
+            if (input.type === "text") {
+                inputValues.push(input.value);
+                const checkbox = document.getElementById(
+                    `${input.id}-checkbox`
+                );
+                if (checkbox && checkbox.checked) {
+                    checkedInputValues.push(input.value);
+                }
+            }
+        });
+        const question = document.getElementById('question');
+        if (question) {
+            q = question.value
+            formData.append('question', q);
+        } else {
+            const fileInput = document.getElementById('file-input');
+            const file = fileInput.files[0];
+            if (file) {
+                formData.append('file', file);
+            } else {
+                alert('من فضلك اختر ملف');
+                return;
+            }
+
         }
+
+        formData.append('answers', inputValues);
+        formData.append('right_answers', checkedInputValues);
+        formData.append('csrfmiddlewaretoken', '{{ csrf_token }}')
+        formData.append('description', document.getElementById('description').value);
+        $.ajax({
+            type: "POST",
+            url: "{% url 'add_question' %}",
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function () {
+                location.reload();
+            },
+            error: function (xhr, status, error) {
+                console.error(xhr);
+            },
+        });
     });
-});
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const dropdown = document.getElementById('question-types');
+        const container = document.getElementById('my-container');
+
+        dropdown.addEventListener('change', () => {
+            const selectedOption = dropdown.value;
+
+            container.innerHTML = '';
+
+            if (selectedOption === 'text') {
+                const newElement = document.createElement('input');
+                newElement.type = 'text';
+                newElement.name = 'text-input';
+                newElement.id = 'question'
+                container.appendChild(newElement);
+            } else if (selectedOption === 'audio') {
+                const newElement = document.createElement('input');
+                newElement.type = 'file';
+                newElement.name = 'audio-input';
+                newElement.accept = 'audio/*'
+                newElement.id = 'file-input';
+                container.appendChild(newElement);
+            } else if (selectedOption === 'video') {
+                const newElement = document.createElement('input');
+                newElement.type = 'file';
+                newElement.name = 'video-input';
+                newElement.accept = 'video/*'
+                newElement.id = 'file-input';
+                container.appendChild(newElement);
+            }
+        });
+    });
 
 </script>
 </body>

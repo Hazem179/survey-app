@@ -1,11 +1,47 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar" dir="rtl">
 <head>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <meta charset="UTF-8">
     <title>استرجاع سؤال</title>
 </head>
-<body>
-<input type="text" placeholder="اكتب اسم السؤال لاسترجاع معلوماته">
-<button>استرجاع</button>
+<body><h1>استرجاع السؤال عن طريق رقمه </h1>
+<form>
+    <label for="object_id">رقم السؤال:</label>
+    <input type="text" id="object_id" name="object_id">
+    <button type="submit" id="get_object_btn">استرجاع السؤال</button>
+</form>
+<div id="question-container"></div>
 </body>
+<script>
+    $(document).ready(function () {
+        $('#get_object_btn').click(function (e) {
+            e.preventDefault();
+            var object_id = $('#object_id').val();
+            $.ajax({
+                url: 'get_object/' + object_id,
+                type: 'GET',
+                success: function (data) {
+                    var file_url = data.file_url;
+                    if (file_url) {
+                        var $video = $('<video controls><source src="' + file_url + '" type="video/mp4"></video>');
+                        $('#question-container').empty().append($video);
+
+                    } else {
+                        $('#question-container').text('لا يوجد سؤال بهذا الرقم');
+                    }
+                    var question_name = data.question;
+                    if (question_name) {
+                        var $question_name = $('<p>' + question_name + '</p>');
+                        $('#question-container').empty().append($question_name);
+                    }
+
+                },
+                error: function (data) {
+                    $('#question-container').text('لا يوجد سؤال بهذا الرقم');
+                }
+            });
+        });
+    });
+</script>
 </html>

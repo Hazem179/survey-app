@@ -4,11 +4,11 @@ from django.db import models
 
 
 class Question(models.Model):
-    name = models.CharField(max_length=100,verbose_name="السؤال")
+    name = models.CharField(max_length=100,verbose_name="السؤال", null=True, blank=True,)
     description = models.TextField(null=True, blank=True,verbose_name="الوصف")
     attachment = models.FileField(upload_to='attachments', null=True, blank=True,verbose_name="الملفات المرفقة")
     def __str__(self):
-        return self.name
+        return self.description
 
 
 class Answers(models.Model):
