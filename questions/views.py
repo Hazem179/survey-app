@@ -51,5 +51,4 @@ def get_object(request, id):
         data = {'file_url': file_url}
     else:
         data = {'question': question.name}
-    print(data)
     return JsonResponse(data)
